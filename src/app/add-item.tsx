@@ -9,9 +9,9 @@ import {
   Text,
   View,
 } from "react-native";
-import { addItem } from "../lib/db";
+import { addClothingItemFromPhoto } from "../lib/clothingItems";
 import { removeBackground } from "../lib/removeBg";
-import { saveBytes, saveFromUri } from "../lib/storage";
+import { imageUri, saveBytes, saveFromUri } from "../lib/storage";
 
 export default function AddItem() {
   const router = useRouter();
@@ -32,6 +32,13 @@ export default function AddItem() {
         );
       }
       addItem(image, original);
+      try {
+        await addClothingItemFromPhoto(imageUri(image));
+      } catch (e) {
+        // The item is already saved locally, so a network problem doesn't lose it.
+        console.warn("Cloud sync failed", e);
+        Alert.alert("Couldn't sync", "This item is saved on this device only.");
+      }
       router.back();
     } finally {
       setBusy(false);
