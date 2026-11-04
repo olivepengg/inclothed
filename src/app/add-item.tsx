@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { addClothingItemFromPhoto } from "../lib/clothingItems";
+import { addItem } from "../lib/db";
 import { removeBackground } from "../lib/removeBg";
 import { imageUri, saveBytes, saveFromUri } from "../lib/storage";
 

@@ -14,7 +14,7 @@ const CONTENT_TYPES: Record<string, string> = {
 
 // expo-file-system's File class isn't documented for web, where the browser's fetch
 // can read the blob or data URLs that the image picker returns.
-async function readBytes(uri: string): Promise<ArrayBuffer> {
+export async function readBytes(uri: string): Promise<ArrayBuffer> {
   if (Platform.OS === "web") {
     const response = await fetch(uri);
     return response.arrayBuffer();

@@ -1,12 +1,14 @@
+import { extractColors } from "./colorExtraction";
 import type {
   ClothingItem,
   ExtractableField,
   ExtractionConfidence,
 } from "./database.types";
+import { readPhotoPixels } from "./imagePixels";
 
 /**
  * What a model returns. Every field is optional, so a model can fill in only what it
- * knows: k-means might return just the colors, and CLIP the category and style tags.
+ * knows: k-means returns just the colors, and CLIP might add the category and style tags.
  */
 export type ExtractedAttributes = Partial<
   Pick<ClothingItem, ExtractableField>
@@ -19,7 +21,7 @@ export type ExtractedAttributes = Partial<
  * Predicts clothing attributes from a photo in the clothing-photos bucket.
  *
  * This takes a Storage path rather than image data, so a model running on a server can
- * fetch the photo itself. Callers won't need to change when real models replace this stub.
+ * fetch the photo itself. Callers won't need to change when more models are added.
  *
  * Any model that needs a secret key must run in a server-side function, such as a
  * Supabase Edge Function, because EXPO_PUBLIC_ values are visible to users.
@@ -27,5 +29,9 @@ export type ExtractedAttributes = Partial<
 export async function extractAttributes(
   imagePath: string,
 ): Promise<ExtractedAttributes> {
-  return {};
+  const { rgba } = await readPhotoPixels(imagePath);
+  const colors = extractColors(rgba);
+  if (!colors) return {};
+
+  return { ...colors, extraction_source: "color_kmeans" };
 }
